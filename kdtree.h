@@ -12,19 +12,24 @@ struct kdtree {
 };
 
 
-/* Sorting comparison funtion */
+/** Sorting comparison funtion */
 int cmp(const PII &a, const PII &b) {
     return ((a.second < b.second) || ((a.second == b.second) && (a.first < b.first)));
 }
 
 
-/* Computes squared distance between two points */
+/** Computes squared distance between two points */
 int distance(int x1, int y1, int x2, int y2) {
     return (x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2);
 }
 
 
-/* This function is for building the kdtree from scratch */
+/** This function is for building the kdtree from scratch 
+ *  sort all the nodes from s to e in the dimsension "depth"
+ *  assign the median of elements from s to e as the current node
+ *  for the left half make a recursive call to left subtree with depth increased by one
+ *  for the right half make a recursive call to right subtree with depth increased by one
+ */
 kdtree* static_build(kdtree *rootaddr, VPII &vec, int depth, int s, int e) {
     if(e < s)
         return NULL;
@@ -50,7 +55,10 @@ kdtree* static_build(kdtree *rootaddr, VPII &vec, int depth, int s, int e) {
 }
 
 
-/* This function is for insertion in the kdtree one point at a time */
+/** This function is for insertion in the kdtree one point at a time 
+ *  It looks for the node closest to the point p and add the new point p is inserted at this node
+ *  This leads to unbalancing of the tree which causes increase in complexity of queries
+ */
 kdtree* dynamic_build(kdtree *rootaddr, PII p, int depth) {
     int p_x, p_y;
     p_x = p.first;
@@ -81,7 +89,9 @@ kdtree* dynamic_build(kdtree *rootaddr, PII p, int depth) {
 }
 
 
-/* This function is to look for a point in kd tree */
+/** This function is to look for a point in kd tree 
+ *  if depth coordinate of point p is less than current node then recursively call left else call right
+ */
 kdtree* find_pt(kdtree *rootaddr, PII p, int depth) {
     int p_x, p_y;
     p_x = p.first;
@@ -106,7 +116,9 @@ kdtree* find_pt(kdtree *rootaddr, PII p, int depth) {
 }
 
 
-/* This function is to find the minimum element in "dim" dimension */
+/** This function is to find the minimum element in "dim" dimension 
+ *  If depth is same as dim then just recursively call left else call both left and right
+ */
 void find_min(kdtree *rootaddr, kdtree* &min_node, int dim, int depth, PII &p) {
     if(rootaddr==NULL)
         return;
@@ -140,7 +152,7 @@ void find_min(kdtree *rootaddr, kdtree* &min_node, int dim, int depth, PII &p) {
 }
 
 
-/* This function is to compute the nearest neighbourhood of a point */
+/** This function is to compute the nearest neighbourhood of a point */
 void nearest_neighbour(kdtree *rootaddr, kdtree* &best_node, int &best_dist, PII p, int depth) {
     if(rootaddr == NULL)
         return;
@@ -178,7 +190,7 @@ void nearest_neighbour(kdtree *rootaddr, kdtree* &best_node, int &best_dist, PII
 }
 
 
-/* This function prints the kdtree (preorder traversal) */
+/** This function prints the kdtree (preorder traversal) */
 void print(kdtree *nodeaddr, int depth, char c) {
     if(nodeaddr == NULL)
         return;
@@ -188,11 +200,12 @@ void print(kdtree *nodeaddr, int depth, char c) {
 }
 
 
-/* This function deletes the kdtree */
+/** This function deletes the kdtree */
 void delete_tree(kdtree *nodeaddr) {
     if(nodeaddr == NULL)
         return;
     delete_tree(nodeaddr->left);  
     delete_tree(nodeaddr->right);
+    /** free the memory location associated with the node */
     free(nodeaddr);
 }
